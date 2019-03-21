@@ -1,5 +1,6 @@
 # Task1:
 - http://www.spiegel.de/wirtschaft/unternehmen/manipulation-in-der-marktforschung-wie-umfragen-gefaelscht-werden-a-1190711.html
+- http://www.spiegel.de/wirtschaft/unternehmen/strom-und-gas-wie-eine-umfrage-ueber-kunden-gefaelscht-wurde-a-1190801.html
 
 # Task2:
 - https://www.reddit.com/r/explainlikeimfive/comments/89q1v3/eli5_what_is_the_difference_between_a_2sample/
