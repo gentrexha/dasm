@@ -1,0 +1,202 @@
+---
+title: "105.708 Data Acquisition and Survey Methods"
+subtitle: "Exercise 2"
+author: "Gent Rexha"
+date: "25-03-2019"
+output: pdf_document
+---
+```{r setup, include=FALSE}
+library(knitr)
+library(ggplot2)
+```
+# Task 4
+Water temperature and detergent concentration are the experiments independent variables. The items under study which are exposed to the change are the palms of the subjects, also called experimental units. The response is bacterial count after washing hands, and the effect is the change in the response caused by changes in the independent variables: water temperature and detergent concentration. Furthermore as a background variable the bacterial count before the experiment should be considered.
+
+# Task 5
+## Introduction
+Simple linear regression is a statistical method for obtaining a formula to predict values of one variable from another where there is a causal relationship between the two variables.
+
+## Straight line formula
+Central to simple linear regression is the formula for a straight line that is most commonly represented as $y=mx+c$ or $y=a+bx$. Statisticians however generally prefer to use the following form involving betas:
+
+\[
+y=\beta_0+\beta_1x
+\]
+
+The variables $y$ and $x$ are those whose relationship we are studying. We give them the following names:
+
+- $y$: dependent (or response) variable;
+- $x$: independent (or predictor or explanatory) variable.
+
+It is convention when plotting data to put the dependent and independent data on the y and x axis respectively; $\beta_0$ and $\beta_1$ are constants and are parameters (or coefficients) that need to be estimated from data. Their roles in the straight line formula are as follows:
+
+- $\beta_0$ : intercept;
+- $\beta_1$ : gradient
+
+## Model assumptions
+
+In simple linear regression we aim to predict the response for the ith individual, $Y_i$, using the individual's score of a single predictor variable, $X_i$. The form of the model is given by:
+
+\[
+Y_i=\beta_0+\beta_1X_i+\epsilon_i
+\]
+
+which comprises a deterministic component involving the two regression coefficients ($\beta$ and $\beta$) and a random component involving the residual (error) term ($\epsilon_i$).
+
+The deterministic component is in the form of a straight line which provides the predicted (mean/expected) response for a given predictor variable value. The residual terms represent the difference between the predicted value and the observed value of an individual. They are assumed to be independently and identically distributed normally with zero mean and variance $\sigma^2$, and account fornatural variability as well as maybe measurement error.
+
+# Example
+```{r}
+set.seed(1)
+x <- rep(6:10, 6)
+f <- factor(c(rep("A", times=15), rep("B", times = 15)))
+e <- rnorm(30, 0.8)
+y <- 2 + as.numeric(f)-1 + 3 * x + e
+df <- data.frame(f = f, x = x, error = e, y = y)
+```
+
+```{r}
+kable(df)
+basic_plot <- ggplot(df) + geom_line((aes(x = x, y = y, color = f)))
+basic_plot
+```
+
+```{r}
+linear_model <- lm(data = df, formula = y ~ x + f)
+summary.lm(linear_model)
+```
+
+```{r}
+linear_model_intercept <- as.vector(confint(linear_model, "(Intercept)", level=0.95))
+linear_model_x <- as.vector(confint(linear_model, "x", level=0.95))
+
+basic_plot +
+ geom_abline(intercept = linear_model_intercept[1], slope = linear_model_x[1]) +
+ geom_abline(intercept = linear_model_intercept[2],slope = linear_model_x[2])
+```
+
+# Task 6
+```{r}
+generate_dataset <- function(n_a, n_b) {
+  rm(.Random.seed, envir=globalenv())
+  x <- rep(6:10, (n_a+n_b)/5)
+  f <- factor(c(rep("A", times=n_a), rep("B", times = n_b)))
+  e <- rnorm(n_a + n_b, 0.8)
+  y <- 2 + as.numeric(f)-1 + 3 * x + e
+  df <- data.frame(f = f, x = x, error = e, y = y)  
+}
+```
+
+```{r}
+estimates <- function(n_a, n_b) {
+  df <- generate_dataset(n_a, n_b)
+  linear_model <- lm(data = df, formula = y ~ x + f)
+  return(as.vector(coef(linear_model)))
+}
+```
+
+## Collect Estimates for na=15 & nb=15
+
+```{r}
+result_1 <- lapply(1:100, function(n) {
+  estimates(15,15)
+})
+```
+
+## Boxplots
+
+### Intercept
+
+```{r}
+intercept_param_1 <- unlist(lapply(result_1, function(elem) {
+  elem[1]
+}))
+
+ggplot() +
+  geom_boxplot(aes(y = intercept_param_1)) +
+  geom_hline(yintercept = 2, color = "orange")
+```
+
+### x
+
+```{r}
+x_param_1 <- unlist(lapply(result_1, function(elem) {
+  elem[2]
+}))
+
+ggplot() +
+  geom_boxplot(aes(y = x_param_1)) +
+  geom_hline(yintercept = 3, color = "red") 
+```
+
+### f
+```{r}
+f_param_1 <- unlist(lapply(result_1, function(elem) {
+  elem[3]
+}))
+
+ggplot() +
+  geom_boxplot(aes(y = f_param_1)) +
+  geom_hline(yintercept = 1, color = "blue") 
+```
+
+## Collect Estimates for na=20 & nb=10
+
+```{r}
+rm(.Random.seed, envir=globalenv())
+result_2 <- lapply(1:100, function(number) {
+  estimates(20,10)
+})
+```
+
+## Boxplots
+
+### Intercept
+
+```{r}
+intercept_param_2 <- unlist(lapply(result_2, function(elem) {
+  elem[1]
+}))
+
+ggplot() +
+  geom_boxplot(aes(y = intercept_param_2)) +
+  geom_hline(yintercept = 2, color = "orange")
+```
+
+### x
+
+```{r}
+x_param_2 <- unlist(lapply(result_2, function(elem) {
+  elem[2]
+}))
+
+ggplot() +
+  geom_boxplot(aes(y = x_param_2)) +
+  geom_hline(yintercept = 3, color = "red") 
+```
+
+### f
+
+```{r}
+f_param_2 <- unlist(lapply(result_2, function(elem) {
+  elem[3]
+}))
+
+ggplot() +
+  geom_boxplot(aes(y = f_param_2)) +
+  geom_hline(yintercept = 1, color = "blue") 
+```
+
+## Comparison
+
+```{r}
+comparison_matrix <- matrix(c(mean(intercept_param_1), mean(intercept_param_2), 2,
+                              mean(x_param_1), mean(x_param_2), 3,
+                              mean(f_param_1), mean(f_param_2), 1), 3, 3, byrow = TRUE)
+
+rownames(comparison_matrix) <- c("Intercept", "x", "f")
+colnames(comparison_matrix) <- c("Estimate - Data set 1", 
+                                 "Estimate - Data set 2", "True Value")
+
+kable(comparison_matrix)
+```
