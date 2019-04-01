@@ -1,0 +1,55 @@
+---
+title: "105.708 Data Acquisition and Survey Methods"
+subtitle: "Exercise 3"
+author: "Gent Rexha"
+date: "31-03-2019"
+output: pdf_document
+---
+```{r setup, include=FALSE}
+library(knitr)
+library(ggplot2)
+```
+# Task 8
+*Question:* When dropped from a fixed height does the smaller or the bigger Roto-Copter spin faster to the ground?
+
+*Answer:* The factors on which the speed of a Roto-Copter depends on are air resistance and surface area of the object (size). Here is an experiment to show how the size depends on the speed.
+
+Two different sized Roto-Copters are made based on the template below printed on a A4 paper.
+
+```{r, echo=FALSE}
+include_graphics("images/roto-copter.png")
+```
+
+Which will be the experimental units of this experiment, resulting in a $small=5.1cm \times 13.4cm$ Roto-Copter and a $large=10.2cm \times 26.5cm$ one. Therefore the independent variables will be the size of the Roto-Copter and drop height, moreover the response would be the speed of the Roto-Copter measured as time in the air. As replicates we define the 16 Roto-Copters, on the other hand a "duplicate" would be executing an experiment on the same experimental unit and defining the measurement error(s). One of the background variables that comes to my mind is how the Roto-Copters are dropped, considering that by hand a perfect duplication for every drop is not possible. Effect is the change in the response caused by a change in an independent variable, in our case the Roto-Copter size. Therefore a calculated effect would be the slowing down of the Roto-Copter if we use the large size.
+
+Thus resulting in a completely randomized design with one factor. Assume we have 16 Roto-Copters, 8 of each size, we define $n = 16$, $t = 2$ and $r=8$. The randomization will be done by defining an order of dropping the Roto-Copters in R.
+
+# Task 9
+After cutting out and folding all of the required Roto-Copters, we define a random order for the dropping of the Roto-Copters:
+
+```{r}
+set.seed(1234)
+size <- factor(rep(c("small", "large"), each = 8))
+rotocopter <- 1:16
+sizeR <- sample(size, 16)
+CRD1f <- data.frame(RotoCopter = rotocopter, Size = sizeR)
+kable(CRD1f)
+```
+
+We also define the height from which the Roto-Copters will be dropped, in this experiment that is $height=2.33m$. After that we drop each Roto-Copter from the same height and measure the time it takes for it to reach the ground.
+
+```{r}
+times <- c(2.27, 2.29, 2.18, 2.26, 2.35, 1.64, 2.20, 2.08, 
+           2.18, 1.80, 2.25, 2.35, 2.33, 2.40, 2.33, 2.13)
+CRD1f$Time = times
+kable(CRD1f)
+```
+
+```{r, echo=FALSE}
+ggplot(CRD1f, aes(x = Size, y = Time)) + geom_boxplot() + ggtitle("Boxplot of time by size")
+```
+
+```{r}
+fit <- lm(Time ~ Size, data = CRD1f)
+summary(fit)
+```
